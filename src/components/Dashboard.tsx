@@ -843,7 +843,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: any) => vo
         <div className="flex-1 flex justify-end">
           <button 
             onClick={() => setShowQuickAdd(true)}
-            className="pointer-events-auto w-14 h-14 bg-theme-text text-theme-bg rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+            className="tour-quick-add pointer-events-auto w-14 h-14 bg-theme-text text-theme-bg rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
           >
             <Plus size={28} />
           </button>

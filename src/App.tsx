@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Joyride, Step } from "react-joyride";
 import {
   User,
   Orbit,
@@ -53,14 +54,56 @@ function MainLayout() {
   const { theme, toggleTheme } = useTheme();
   const isAdmin = auth.currentUser?.email === "sparsh@bluepin.in";
 
+  const [runTour, setRunTour] = useState(false);
+
+  const tourSteps: Step[] = [
+    {
+      target: ".tour-dashboard-nav",
+      content: "Welcome to Bluepin! This is your dashboard where you can see a high-level overview of your health.",
+    },
+    {
+      target: ".tour-quick-add",
+      content: "Use this action button to easily log your Weight, record Glucose levels, or upload a Health Report for analysis.",
+    },
+    {
+      target: ".tour-glucose-nav",
+      content: "View detailed charts and track your blood glucose levels over time here.",
+    },
+    {
+      target: ".tour-canvas-nav",
+      content: "Upload lab reports and get an AI-powered analysis of your biomarkers.",
+    },
+    {
+      target: ".tour-profile-btn",
+      content: "Update your details and preferences here.",
+    },
+  ];
+
   useEffect(() => {
     const showTimer = setTimeout(() => setIsWaving(true), 1500);
     const hideTimer = setTimeout(() => setIsWaving(false), 6000);
+    
+    // Check if tour should run
+    const hasCompletedTour = localStorage.getItem("bluepin_tour_completed");
+    if (!hasCompletedTour) {
+      // Slight delay to ensure elements are mounted
+      setTimeout(() => setRunTour(true), 500);
+    }
+    
     return () => {
       clearTimeout(showTimer);
       clearTimeout(hideTimer);
     };
   }, []);
+
+  const handleJoyrideCallback = (data: any) => {
+    const { status } = data;
+    const finishedStatuses = ["finished", "skipped"];
+    if (finishedStatuses.includes(status)) {
+      setRunTour(false);
+      localStorage.setItem("bluepin_tour_completed", "true");
+    }
+  };
 
   return (
     <div
@@ -69,6 +112,20 @@ function MainLayout() {
         isSidebarCollapsed ? "md:pl-20" : "md:pl-64",
       )}
     >
+      <Joyride
+        steps={tourSteps}
+        run={runTour}
+        continuous
+        showSkipButton
+        showProgress
+        callback={handleJoyrideCallback}
+        styles={{
+          options: {
+            primaryColor: '#1A73E8',
+            zIndex: 10000,
+          }
+        }}
+      />
       {/* Desktop Sidebar */}
       <aside
         className={cn(
@@ -117,6 +174,7 @@ function MainLayout() {
             onClick={() => setActiveTab("dashboard")}
             isCollapsed={isSidebarCollapsed}
             colorClass="text-blue-500"
+            className="tour-dashboard-nav"
           />
           <NavItem
             icon={<Droplet />}
@@ -125,6 +183,7 @@ function MainLayout() {
             onClick={() => setActiveTab("glucose")}
             isCollapsed={isSidebarCollapsed}
             colorClass="text-red-500"
+            className="tour-glucose-nav"
           />
           <NavItem
             icon={<FileText />}
@@ -133,6 +192,7 @@ function MainLayout() {
             onClick={() => setActiveTab("biomarkers")}
             isCollapsed={isSidebarCollapsed}
             colorClass="text-emerald-500"
+            className="tour-canvas-nav"
           />
 
           {isAdmin && (
@@ -210,7 +270,7 @@ function MainLayout() {
           />
           <button
             onClick={() => setShowProfile(true)}
-            className="w-10 h-10 bg-theme-card border border-theme-border rounded-full flex items-center justify-center text-theme-text hover:bg-theme-card-sec transition-colors shadow-sm group"
+            className="tour-profile-btn w-10 h-10 bg-theme-card border border-theme-border rounded-full flex items-center justify-center text-theme-text hover:bg-theme-card-sec transition-colors shadow-sm group"
           >
             <div className="relative flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <Hexagon
@@ -282,7 +342,7 @@ function MainLayout() {
             </button>
             <button
               onClick={() => setShowProfile(true)}
-              className="text-theme-text-sec p-2 group"
+              className="tour-profile-btn text-theme-text-sec p-2 group"
             >
               <div className="relative flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <Hexagon
@@ -334,6 +394,7 @@ function MainLayout() {
           isActive={activeTab === "dashboard"}
           onClick={() => setActiveTab("dashboard")}
           colorClass="text-blue-500"
+          className="tour-dashboard-nav"
         />
         <MobileNavItem
           icon={<Droplet size={20} />}
@@ -341,6 +402,7 @@ function MainLayout() {
           isActive={activeTab === "glucose"}
           onClick={() => setActiveTab("glucose")}
           colorClass="text-red-500"
+          className="tour-glucose-nav"
         />
         <MobileNavItem
           icon={<FileText size={20} />}
@@ -348,6 +410,7 @@ function MainLayout() {
           isActive={activeTab === "biomarkers"}
           onClick={() => setActiveTab("biomarkers")}
           colorClass="text-emerald-500"
+          className="tour-canvas-nav"
         />
         {isAdmin && (
           <MobileNavItem
@@ -371,6 +434,7 @@ function NavItem({
   onClick,
   isCollapsed,
   colorClass,
+  className,
 }: {
   icon: React.ReactNode;
   label: string;
@@ -378,6 +442,7 @@ function NavItem({
   onClick: () => void;
   isCollapsed?: boolean;
   colorClass?: string;
+  className?: string;
 }) {
   return (
     <button
@@ -389,6 +454,7 @@ function NavItem({
         isActive
           ? "bg-theme-card-sec text-theme-text font-medium"
           : "text-theme-text-sec hover:bg-theme-card-sec hover:text-theme-text",
+        className
       )}
     >
       <span
@@ -410,12 +476,14 @@ function MobileNavItem({
   isActive,
   onClick,
   colorClass,
+  className,
 }: {
   icon: React.ReactNode;
   label: string;
   isActive: boolean;
   onClick: () => void;
   colorClass?: string;
+  className?: string;
 }) {
   return (
     <button
@@ -423,6 +491,7 @@ function MobileNavItem({
       className={cn(
         "flex flex-col items-center justify-center space-y-1 w-16 py-1 transition-colors",
         isActive ? "text-theme-text" : "text-theme-text-sec",
+        className
       )}
     >
       <span
