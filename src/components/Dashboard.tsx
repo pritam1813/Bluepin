@@ -10,6 +10,7 @@ import { useAppStore } from '../store';
 import { Pin, Target, Hexagon, Circle, X, FileText, ChevronRight, ChevronDown, Droplet, Plus, ArrowUp, ArrowDown, Users, Check, Activity, HeartPulse, User, Flame } from 'lucide-react';
 import { parseISO, isAfter, subDays } from 'date-fns';
 import { cn, istToday, safeFormat } from '../lib/utils';
+import { friendlyFirebaseError } from '../lib/friendlyFirebaseError';
 import { TIER_1, calculateStatus, isCoreBiomarkerPresent, getCoreBiomarkersByCategory, hydrateBiomarker } from '../lib/biomarkerUtils';
 import { getHydratedBiomarkers, getDashboardMetrics, sortLabReports, getCanvasHealthScore } from '../lib/derivedMetrics';
 import { auth } from '../lib/firebase';
@@ -920,7 +921,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: any) => vo
               setQuickAddAction('none');
               setShowQuickAdd(false);
             } catch(e: any) {
-              alert(e.message || "Failed to add weight");
+              alert(friendlyFirebaseError(e, "Failed to add weight"));
             }
           }} 
         />
@@ -934,7 +935,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: any) => vo
               setQuickAddAction('none');
               setShowQuickAdd(false);
             } catch(e: any) {
-              alert(e.message || "Failed to add glucose");
+              alert(friendlyFirebaseError(e, "Failed to add glucose"));
             }
           }}
         />

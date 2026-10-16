@@ -41,6 +41,7 @@ import {
 import { MealTiming } from "../types";
 
 import { cn, istToday, safeFormat } from "../lib/utils";
+import { friendlyFirebaseError } from "../lib/friendlyFirebaseError";
 
 export default function GlucoseTab() {
   const {
@@ -1535,7 +1536,7 @@ export default function GlucoseTab() {
               await addGlucoseReading(r);
               setShowAddModal(false);
             } catch (e: any) {
-              alert(e.message || "Failed to add reading");
+              alert(friendlyFirebaseError(e, "Failed to add reading"));
             }
           }}
         />

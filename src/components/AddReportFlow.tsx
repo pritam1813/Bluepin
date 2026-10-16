@@ -9,6 +9,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { auth, storage } from "../lib/firebase";
+import { friendlyFirebaseError } from "../lib/friendlyFirebaseError";
 import { useAppStore } from "../store";
 import { LabReport } from "../types";
 import { cn, trackEvent } from "../lib/utils";
@@ -201,7 +202,7 @@ export function AddReportFlow({
       }
     } catch (err: any) {
       if (err.name === "AbortError") return;
-      setErrorMsg(err.message || "Failed to upload and process document.");
+      setErrorMsg(friendlyFirebaseError(err, "Failed to upload and process document."));
     } finally {
       if (ticker) clearInterval(ticker);
       setIsUploading(false);

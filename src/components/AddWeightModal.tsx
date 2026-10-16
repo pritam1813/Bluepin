@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { friendlyFirebaseError } from '../lib/friendlyFirebaseError';
 
 export function AddWeightModal({ onClose, onAdd }: { onClose: () => void, onAdd: (weight: number, date: string) => Promise<void> }) {
   const [newWeight, setNewWeight] = useState('');
@@ -9,7 +10,7 @@ export function AddWeightModal({ onClose, onAdd }: { onClose: () => void, onAdd:
     if (!newWeight || isNaN(Number(newWeight)) || Number(newWeight) <= 0) return;
     const todayStr = new Date().toISOString().split('T')[0];
     setIsSubmitting(true);
-    try { await onAdd(Number(newWeight), todayStr); } catch(err: any) { alert(err.message || "Failed to add weight"); } finally { setIsSubmitting(false); }
+    try { await onAdd(Number(newWeight), todayStr); } catch(err: any) { alert(friendlyFirebaseError(err, "Failed to add weight")); } finally { setIsSubmitting(false); }
   };
 
   return (

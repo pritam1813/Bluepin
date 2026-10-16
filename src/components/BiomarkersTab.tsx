@@ -1,4 +1,5 @@
 import { auth, db } from "../lib/firebase";
+import { friendlyFirebaseError } from "../lib/friendlyFirebaseError";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import React, { useState, useMemo, useEffect } from "react";
 import { motion } from "motion/react";
@@ -271,7 +272,7 @@ export default function BiomarkersTab() {
       setIsAiInsightsCollapsed(false);
     } catch (err: any) {
       console.error(err);
-      setAiError(err.message || "Failed to generate AI highlights.");
+      setAiError(friendlyFirebaseError(err, "Failed to generate AI highlights."));
     } finally {
       setIsAnalyzing(false);
     }

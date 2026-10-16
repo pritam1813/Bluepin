@@ -19,6 +19,7 @@ import {
   Clock,
 } from "lucide-react";
 import { auth } from "../lib/firebase";
+import { friendlyFirebaseError } from "../lib/friendlyFirebaseError";
 import { useAppStore } from "../store";
 import { cn } from "../lib/utils";
 import { WhatsAppIcon } from "./CustomEmojis";
@@ -226,7 +227,7 @@ export function WhatsAppModal({ isOpen, onClose }: WhatsAppModalProps) {
 
       setStep("otp");
     } catch (err: any) {
-      setError(err.message || "Could not send verification code.");
+      setError(friendlyFirebaseError(err, "Could not send verification code."));
     } finally {
       setLoading(false);
     }
@@ -264,7 +265,7 @@ export function WhatsAppModal({ isOpen, onClose }: WhatsAppModalProps) {
       updateProfile({ whatsappPhone: data.phone || cleanNumber });
       setStep("phone");
     } catch (err: any) {
-      setError(err.message || "Invalid verification code.");
+      setError(friendlyFirebaseError(err, "Invalid verification code."));
     } finally {
       setLoading(false);
     }
@@ -348,7 +349,7 @@ export function WhatsAppModal({ isOpen, onClose }: WhatsAppModalProps) {
         otpInputRefs.current[0]?.focus();
       }, 100);
     } catch (err: any) {
-      setError(err.message || "Could not resend code.");
+      setError(friendlyFirebaseError(err, "Could not resend code."));
     } finally {
       setIsResending(false);
     }
@@ -379,7 +380,7 @@ export function WhatsAppModal({ isOpen, onClose }: WhatsAppModalProps) {
         updateProfile({ whatsappPhone: undefined });
       }
     } catch (err: any) {
-      setError(err.message || "Failed to unlink account.");
+      setError(friendlyFirebaseError(err, "Failed to unlink account."));
     } finally {
       setLoading(false);
     }
@@ -410,7 +411,7 @@ export function WhatsAppModal({ isOpen, onClose }: WhatsAppModalProps) {
       setReminder(data.reminder ?? null);
       setPendingHour(null);
     } catch (err: any) {
-      setReminderError(err.message || "Failed to save your reminder.");
+      setReminderError(friendlyFirebaseError(err, "Failed to save your reminder."));
     } finally {
       setReminderLoading(false);
     }
@@ -435,7 +436,7 @@ export function WhatsAppModal({ isOpen, onClose }: WhatsAppModalProps) {
       setReminder(data.reminder ?? null);
       setPendingHour(null);
     } catch (err: any) {
-      setReminderError(err.message || "Failed to stop your reminder.");
+      setReminderError(friendlyFirebaseError(err, "Failed to stop your reminder."));
     } finally {
       setReminderLoading(false);
     }
@@ -463,7 +464,7 @@ export function WhatsAppModal({ isOpen, onClose }: WhatsAppModalProps) {
       setDeepLink(data.deepLink);
       setBotPhone(data.botPhone);
     } catch (err: any) {
-      setError(err.message || "Could not create link code.");
+      setError(friendlyFirebaseError(err, "Could not create link code."));
     } finally {
       setLoading(false);
     }

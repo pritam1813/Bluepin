@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAppStore } from "../store";
 import { calculateBMI, getBMICategory, safeFormat } from "../lib/utils";
+import { friendlyFirebaseError } from "../lib/friendlyFirebaseError";
 import { Pin, Plus, ChevronDown, ChevronUp } from "lucide-react";
 import {
   AreaChart,
@@ -84,7 +85,7 @@ export function WeightCard({
       });
       setShowAddWeight(false);
     } catch (e: any) {
-      alert(e.message || "Failed to add weight");
+      alert(friendlyFirebaseError(e, "Failed to add weight"));
     }
   };
 

@@ -1,4 +1,5 @@
 import { auth } from "../lib/firebase";
+import { friendlyFirebaseError } from "../lib/friendlyFirebaseError";
 import React, {
   useState,
   useRef,
@@ -433,7 +434,7 @@ export function AddGlucoseModal({ onClose, onAdd }: AddGlucoseModalProps) {
           trigger,
         },
       );
-      setErrorObj(err.message || "Failed to process image.");
+      setErrorObj(friendlyFirebaseError(err, "Failed to process image."));
     } finally {
       if (isMountedRef.current) {
         setUploadingSource(null);
@@ -504,7 +505,7 @@ export function AddGlucoseModal({ onClose, onAdd }: AddGlucoseModalProps) {
         method: source === "Manual" ? "manual" : "camera_ai",
       });
     } catch (err: any) {
-      setErrorObj(err.message || "Failed to add reading");
+      setErrorObj(friendlyFirebaseError(err, "Failed to add reading"));
     } finally {
       setIsSubmitting(false);
     }

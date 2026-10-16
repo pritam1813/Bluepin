@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useRe
 import { AppState, GlucoseReading, LabReport, WeightEntry, Goal, GoalLog, UserProfile } from "./types";
 import { DEFAULT_GOALS, DUMMY_GLUCOSE_READINGS } from "./data";
 import { auth, db, handleFirestoreError, OperationType } from "./lib/firebase";
+import { friendlyFirebaseError } from "./lib/friendlyFirebaseError";
 import { doc, collection, onSnapshot, setDoc, deleteDoc, serverTimestamp, updateDoc, getDoc, getDocs, deleteField, runTransaction, writeBatch, query, orderBy, limit } from "firebase/firestore";
 
 const defaultState: AppState = {
@@ -228,7 +229,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       }
       await batch.commit();
     } catch (e: any) {
-      alert(e.message || "Failed to add glucose reading");
+      alert(friendlyFirebaseError(e, "Failed to add glucose reading"));
       handleFirestoreError(e, OperationType.CREATE, `users/${uid}/glucoseReadings`);
     }
   };
@@ -282,7 +283,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       }
       await batch.commit();
     } catch (e: any) {
-      alert(e.message || "Failed to add report");
+      alert(friendlyFirebaseError(e, "Failed to add report"));
       handleFirestoreError(e, OperationType.CREATE, `users/${uid}/labReports`);
     }
   };
@@ -295,7 +296,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       batch.delete(ref);
       await batch.commit();
     } catch (e: any) {
-      alert(e.message || "Failed to delete report");
+      alert(friendlyFirebaseError(e, "Failed to delete report"));
       handleFirestoreError(e, OperationType.DELETE, `users/${uid}/labReports/${id}`);
     }
   };
