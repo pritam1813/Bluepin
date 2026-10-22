@@ -36,6 +36,14 @@ async function fillVerified(page: Page, label: string, value: string) {
 
 test.beforeEach(async ({ page }) => {
   test.skip(!PASSWORD, "E2E_TEST_PASSWORD not set");
+  // Protocol-level listeners: these fire even if the renderer is wedged.
+  const consoleErrors: string[] = [];
+  const pageErrors: string[] = [];
+  page.on("console", (m) => {
+    if (m.type() === "error") consoleErrors.push(m.text().slice(0, 300));
+  });
+  page.on("pageerror", (e) => pageErrors.push(String(e).slice(0, 300)));
+
   await page.goto("/");
   // Dismiss the PWA install prompt if it appears.
   const notNow = page.getByRole("button", { name: "Not Now" });
@@ -60,16 +68,22 @@ test.beforeEach(async ({ page }) => {
       .textContent()
       .catch(() => null);
     // On a hang (no banner), dump the UI state so CI logs show where it stuck.
+    // page.url() is sync and protocol-level; evaluate is a fallback only.
     const pageState = await page
       .evaluate(() => ({
-        url: location.href,
         title: document.title,
         body: document.body.innerText.slice(0, 400).replace(/\s+/g, " "),
       }))
       .catch(() => null);
+    const diag = [
+      `url=${page.url()}`,
+      pageState ? `title="${pageState.title}" body="${pageState.body}"` : "evaluate-blocked",
+      consoleErrors.length ? `consoleErrors=${JSON.stringify(consoleErrors.slice(0, 5))}` : "no-console-errors",
+      pageErrors.length ? `pageErrors=${JSON.stringify(pageErrors.slice(0, 5))}` : "no-page-errors",
+    ].join(" | ");
     throw new Error(
       `E2E login failed${errText ? `: "${errText.trim()}"` : " (dashboard never appeared, no error banner)"}` +
-        (pageState ? ` | page: ${JSON.stringify(pageState)}` : ""),
+        ` | ${diag}`,
     );
   }
 });
